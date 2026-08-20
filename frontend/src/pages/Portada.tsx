@@ -1,14 +1,11 @@
 import { AgentCard } from "../components/AgentCard";
+import { AGENTES } from "../data/mockData";
 
-const AGENTES = [
-  { nombre: "Director / Estratega", funcion: "Orquesta al equipo, guarda tu marca y decide qué grabar y por qué." },
-  { nombre: "Investigador de tendencias", funcion: "Rastrea qué funciona ahora mismo y encaja con tu personalidad." },
-  { nombre: "Guionista viral", funcion: "Estructura tus guiones por bloques, con ganchos que retienen." },
-  { nombre: "Planner editorial", funcion: "Monta tu calendario semanal equilibrando alcance y retención." },
-  { nombre: "Analista de datos", funcion: "Lee tus métricas y te dice exactamente qué bloque falló." },
-];
+type PortadaProps = {
+  onEmpezar: () => void;
+};
 
-export function Portada() {
+export function Portada({ onEmpezar }: PortadaProps) {
   return (
     <main className="flex min-h-screen flex-col items-center justify-center gap-12 px-6 py-16 text-center">
       <div className="max-w-2xl">
@@ -30,6 +27,7 @@ export function Portada() {
 
       <button
         type="button"
+        onClick={onEmpezar}
         className="font-rotulo rounded-md bg-ambar px-8 py-3 text-base font-semibold uppercase tracking-wide text-pantano transition-colors hover:bg-ambar-soft"
       >
         Empezar
