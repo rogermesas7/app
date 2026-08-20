@@ -6,15 +6,29 @@
 > desglosado en tareas concretas, con las cuentas/servicios a dar de alta en
 > cada fase y los "no se nos pase" que se olvidan en casi todos los proyectos.
 >
-> Guárdalo también en el repo, por ejemplo `docs/ROADMAP-COMPLETO.md`.
-> Fecha: agosto 2026.
+> Es el checklist oficial del proyecto: nada de lo que necesita la app para
+> estar completa se queda fuera de aquí.
+>
+> Fecha: agosto 2026. Revisado y reorganizado en las 6 fases de trabajo
+> acordadas (+ una 7ª para redes sociales, que no encajaba en ninguna de las
+> seis — ver nota en la sección 0).
 
 ---
 
 ## 0. Cómo leer este documento
 
-- Sigue las mismas 5 fases + bloques de producción del Informe Maestro
-  (sección 7). Aquí cada fase se abre en tareas técnicas concretas.
+- Trabajamos por fases, en este orden, **sin pasar a la siguiente sin
+  aprobación explícita**:
+  1. **Maqueta y diseño** — pantallas y flujos, con datos de ejemplo.
+  2. **Funciones reales** — conectar la IA de verdad, que los botones hagan
+     cosas de verdad.
+  3. **Cuentas y accesos** — login, usuarios, **y el paquete legal mínimo**
+     (ver nota abajo).
+  4. **Cobro** — créditos/suscripción, pasarela de pago.
+  5. **Legal** — el resto del trabajo legal, el pesado y formal.
+  6. **Lanzamiento** — dominio, hosting, publicar.
+  7. **Conexiones sociales** (Instagram/TikTok) — fuera del camino
+     crítico, no bloquea el lanzamiento (ver nota abajo).
 - Cada fase tiene tres bloques: **Construir**, **Cuentas/servicios a crear**
   y **No se nos pase**.
 - No hace falta crear una cuenta o servicio antes de que su fase lo pida.
@@ -22,6 +36,20 @@
 - Aviso: las partes legales y fiscales de este documento son un **mapa de
   qué mirar**, no asesoría legal ni fiscal. Antes de cobrar de verdad,
   confírmalo con un gestor/abogado — sale más barato que un error.
+
+**Dos decisiones ya tomadas (agosto 2026), aplicadas en todo el documento:**
+
+1. **Paquete legal mínimo adelantado a la Fase 3.** Cosas como firmar el DPA
+   de Anthropic, publicar un aviso de privacidad básico, el aviso de "esto
+   lo genera una IA" y el flujo de borrar/exportar datos no esperan a la
+   Fase 5 — tienen que existir en cuanto haya una sola persona real usando
+   la app que no seas tú. La Fase 5 sigue existiendo para el trabajo legal
+   completo y formal (textos definitivos, IVA/OSS, fichas de las tiendas,
+   seguros).
+2. **Instagram/TikTok tiene fase propia y no bloquea nada.** Se mueve fuera
+   del camino crítico, a una Fase 7 después del lanzamiento. Mientras tanto
+   —y para siempre, si hiciera falta— la app funciona con métricas metidas
+   a mano (ya construido en la Fase 2).
 
 ---
 
@@ -36,10 +64,11 @@ con Claude Code):
 | **Frontend móvil** | React Native + Expo (TypeScript) | El prototipo ya es `.jsx`/React → migración natural. Expo da compilación en la nube (EAS Build) sin pelearte con Xcode/Android Studio, y un único código para iOS y Android. |
 | **Backend** | Node.js + TypeScript (Fastify o Express) | Mismo lenguaje que el frontend → un solo cerebro mental. Fácil de alojar barato. |
 | **Base de datos + Auth + Storage** | Supabase (Postgres) | Te da base de datos, login y almacenamiento de archivos en un solo sitio, con opción de región UE (bueno para RGPD), y tiene plan gratuito para la Fase 1-2. |
-| **IA** | API de Claude (Anthropic), directa | Es lo que ya usan tus agentes. Mirar Zero Data Retention / Bedrock Frankfurt cuando llegue el RGPD real (ver sección 5). |
-| **Pagos** | RevenueCat por encima de StoreKit (iOS) + Google Play Billing (Android) + Stripe (web) | Unifica las tres pasarelas de pago de suscripción en un solo sitio; evita reconstruir la lógica de suscripciones tres veces. Investigarlo bien antes de decidir (ver sección 4, es la pieza con más matices legales). |
+| **IA** | API de Claude (Anthropic), directa | Es lo que ya usan tus agentes. Mirar Zero Data Retention / Bedrock Frankfurt cuando llegue el RGPD real (ver Fase 3/5). |
+| **Pagos** | RevenueCat por encima de StoreKit (iOS) + Google Play Billing (Android) + Stripe (web) | Unifica las tres pasarelas de pago de suscripción en un solo sitio; evita reconstruir la lógica de suscripciones tres veces. Investigarlo bien antes de decidir (ver Fase 4, es la pieza con más matices legales). |
 | **Hosting backend** | Railway o Render | Despliegue simple desde Git, barato para empezar, escala si hace falta. |
 | **Build y publicación móvil** | EAS Build + EAS Submit (Expo) | Compila y sube a App Store/Play Store sin máquina Mac propia. |
+| **Email transaccional** | Resend, Postmark o similar, con dominio propio | Confirmaciones de cuenta, recibos, recuperación de contraseña. Sin esto, los emails automáticos de Supabase caen fácilmente en spam. |
 | **Errores en producción** | Sentry | Gratis para volumen bajo, imprescindible en cuanto haya un usuario real que no seas tú. |
 | **Analítica de producto** | PostHog (self-host o cloud EU) | Para saber qué pantallas se usan y dónde se atasca la gente. Con opción de hosting en la UE. |
 | **CI/CD** | GitHub Actions | Tests y build automáticos en cada cambio. |
@@ -47,24 +76,40 @@ con Claude Code):
 Nada de esto es definitivo ni caro: casi todo tiene capa gratuita suficiente
 para la Fase 1 y 2.
 
+> **Nota de estado (agosto 2026):** la maqueta de la Fase 1 ya arrancada en
+> este repo (`frontend/`) está montada en **web con Vite + React**, no en
+> Expo/React Native como recomienda esta tabla. Es una decisión pendiente de
+> confirmar contigo: seguir en web (más rápido de iterar, pero sin tiendas de
+> apps) o migrar a Expo antes de entrar en la Fase 2, ya que cambiar de stack
+> a mitad de la Fase 2 (con backend real ya conectado) sale más caro que
+> decidirlo ahora.
+
 ---
 
-## 2. FASE 0 — Planos (expandido)
+## 2. FASE 1 — Maqueta y diseño
+
+Pantallas y flujos, con datos de ejemplo. Sin backend real, sin llamadas a
+la API de Claude todavía. **Es donde estamos.**
 
 **Construir**
 - [ ] Revisar el prototipo (`prototipo-caiman.jsx`) y decidir qué pantallas se
-      llevan tal cual y cuáles se rediseñan al pasar a React Native (los
-      componentes web no son 1:1 con los de móvil).
+      llevan tal cual y cuáles se rediseñan (los componentes web no son 1:1
+      con los de móvil si se migra a React Native).
 - [ ] Elegir nombre definitivo de la app y comprobar que el dominio y el
-      handle de redes están libres (evita descubrirlo en la Fase 3).
+      handle de redes están libres (evita descubrirlo en la Fase 4).
 - [ ] Bocetar (aunque sea en texto) las pantallas nuevas de 5-bis
       (formatos de grabación, presencia en cámara, teleprompter).
+- [x] Portada, Onboarding (simulado) y Dashboard (Semana/Guión/Análisis) con
+      datos de ejemplo — hecho en `frontend/` (web, Vite + React).
+- [ ] Decidir si se mantiene web o se migra a Expo/React Native (ver nota de
+      la sección 1) antes de pasar a la Fase 2.
 
 **Cuentas/servicios a crear**
-- [ ] Repositorio Git (GitHub/GitLab) si aún no existe uno para la app
-      (separado o no de `caiman-proyecto`, a decidir).
+- [x] Repositorio Git (`rogermesas7/app`).
 - [ ] Cuenta de Anthropic Console + método de pago, para tener ya la API key
-      lista en cuanto arranque la Fase 1.
+      lista en cuanto arranque la Fase 2.
+- [ ] Cuenta Expo/EAS (gratis para empezar) — solo si se confirma migración
+      a React Native.
 
 **No se nos pase**
 - [ ] Comprobar que el nombre elegido no choca con una marca registrada
@@ -72,12 +117,12 @@ para la Fase 1 y 2.
 
 ---
 
-## 3. FASE 1 — App real para un usuario (tú)
+## 3. FASE 2 — Funciones reales
+
+Conectar la IA de verdad: que los botones hagan cosas de verdad. Sigue
+siendo para un solo usuario (tú) — todavía sin login ni multiusuario.
 
 **Construir**
-- [ ] Inicializar proyecto Expo + TypeScript.
-- [ ] Montar navegación entre las pantallas del dashboard (Semana / Guión /
-      Análisis) + portada + onboarding.
 - [ ] Backend mínimo: un endpoint por agente (`/director`, `/investigador`,
       `/guionista`, `/planner`, `/analista`) que reciba el contexto y llame a
       la API de Claude con el prompt correspondiente.
@@ -85,14 +130,13 @@ para la Fase 1 y 2.
 - [ ] Portar tu `marca.md`, `banco-ideas.md`, `calendario.md`, `learnings.md`
       reales como contexto fijo (aún sin base de datos multiusuario).
 - [ ] Pantalla para meter métricas a mano (sustituye a la conexión con
-      Instagram/TikTok, que es Fase 4).
+      Instagram/TikTok, que es Fase 7, y no bloquea nada mientras tanto).
 - [ ] Variables de entorno para la API key de Claude (nunca hardcodeada, nunca
       en el frontend — todas las llamadas a la IA pasan por tu backend).
 - [ ] Manejo de errores básico: qué ve el usuario si la API de Claude falla o
       tarda (spinner, reintento, mensaje claro — nada de pantalla en blanco).
 
 **Cuentas/servicios a crear**
-- [ ] Cuenta Expo/EAS (gratis para empezar).
 - [ ] Servicio de hosting del backend (Railway/Render), plan gratuito o el
       más barato.
 
@@ -101,12 +145,19 @@ para la Fase 1 y 2.
       lista de variables necesarias.
 - [ ] Límite manual "duro" en el código a la cantidad de llamadas a la API
       mientras seas el único usuario — un bug en un bucle puede disparar el
-      gasto de tokens en minutos, y en la Fase 1 no hay aún sistema de
-      créditos que lo frene.
+      gasto de tokens en minutos, y aquí todavía no hay sistema de créditos
+      que lo frene.
+- [ ] Protección básica contra prompt injection: separar bien la instrucción
+      de sistema de cada agente de lo que mete el usuario como entrada libre.
 
 ---
 
-## 4. FASE 2 — Multiusuario
+## 4. FASE 3 — Cuentas y accesos (+ paquete legal mínimo)
+
+Aquí es donde la app pasa de "solo tú" a tener usuarios reales — por eso
+entra también el paquete legal mínimo: en cuanto hay una persona real
+distinta de ti usando la app, ya aplica el RGPD, así que no puede esperar a
+la Fase 5.
 
 **Construir**
 - [ ] Login (email/contraseña +, si quieres, Google/Apple Sign-In — Apple
@@ -121,6 +172,28 @@ para la Fase 1 y 2.
 - [ ] Aislamiento de datos entre usuarios (que el usuario A nunca pueda leer
       nada del usuario B — revisar las reglas de acceso a la base de datos,
       no solo el frontend).
+- [ ] **Borrado de cuenta autoservicio, dentro de la propia app.** No es solo
+      buena práctica RGPD: es un requisito de la App Store desde 2022
+      (guideline 5.1.1(v)) — el usuario tiene que poder borrar su cuenta él
+      mismo, borrado real (no "desactivar"), y si usas Sign in with Apple hay
+      que revocar el token vía su API al borrar.
+      [Fuente (Apple Developer)](https://developer.apple.com/support/offering-account-deletion-in-your-app)
+- [ ] Protección anti-bot en el registro (captcha o equivalente) — sin esto,
+      el sistema de créditos gratuitos (Fase 4) es un imán para abuso.
+
+**Paquete legal mínimo (adelantado desde la Fase 5)**
+- [ ] Firmar el DPA (Acuerdo de Tratamiento de Datos) de Anthropic desde la
+      Consola antes de procesar datos personales de usuarios reales.
+      [Fuente (compound.law, 2026)](https://compound.law/en-DE/tools/anthropic-api/)
+- [ ] Publicar una Política de Privacidad básica (aunque se amplíe en la
+      Fase 5) y un Aviso Legal mínimo.
+- [ ] Aviso claro de "esto lo genera una IA" en el producto — adelanto de la
+      obligación de transparencia del Reglamento de IA de la UE (ver Fase 5).
+- [ ] Flujo real de "borra mis datos" y "descárgame mis datos" (derechos
+      RGPD), no solo una frase en la política de privacidad.
+- [ ] Tratar el audio de la biblia de marca con cuidado extra: documentar
+      cuánto tiempo se guarda y por qué, aunque el objetivo no sea identificar
+      a la persona.
 
 **Cuentas/servicios a crear**
 - [ ] Proyecto Supabase (o el gestor de base de datos que elijas) en
@@ -128,9 +201,6 @@ para la Fase 1 y 2.
 - [ ] Sentry, para empezar a ver errores reales de gente que no eres tú.
 
 **No se nos pase**
-- [ ] Borrado de cuenta y datos: aunque aún no cobres, en cuanto hay más de
-      un usuario ya aplica el RGPD — necesitas poder borrar los datos de
-      alguien si te lo pide (ver sección 5).
 - [ ] Copias de seguridad de la base de datos activadas desde el primer día
       con usuarios reales (Supabase las ofrece, pero hay que confirmarlas).
 - [ ] Rate limiting por usuario (que uno no pueda saturar tu backend/factura
@@ -138,10 +208,14 @@ para la Fase 1 y 2.
 
 ---
 
-## 5. FASE 3 — Sostenible y cobrable
+## 5. FASE 4 — Cobro
 
-Esta es la fase con más piezas que se olvidan. Se divide en cuatro frentes:
-créditos, cobro, tiendas de apps y legal.
+**Antes de nada en esta fase: alta como autónomo o sociedad ante Hacienda.**
+Facturar sin estar dado de alta solo es legal si la actividad es esporádica
+y por debajo del SMI — una suscripción recurrente no cumple ninguna de las
+dos condiciones. Además, no se puede abrir cuenta de empresa en Stripe,
+RevenueCat, ni el Apple Developer Program de pago sin este trámite hecho
+antes. [Fuente (nnespana.es, 2026)](https://www.nnespana.es/blog/negocios-empresas/autonomos/puedo-emitir-una-factura-sin-antes-darme-de-alta-como-autonomo-esto-es-lo-que-dice-la-ley)
 
 ### 5.1 Sistema de créditos
 
@@ -180,7 +254,7 @@ de "Stripe sí o no":
   nativa dentro de la app en iOS y Android (vía un gestor tipo RevenueCat que
   unifica StoreKit + Google Play Billing), y Stripe solo si en algún momento
   añades una versión web de pago fuera de las tiendas. **Esto hay que
-  decidirlo cuando llegue la Fase 3, no antes** — las reglas de las tiendas
+  decidirlo cuando llegue esta fase, no antes** — las reglas de las tiendas
   cambian con frecuencia, así que reconfirmar en ese momento en vez de fiarte
   de esta nota.
 
@@ -194,58 +268,110 @@ de "Stripe sí o no":
       obligatorio (Directiva de derechos del consumidor): si te suscribes con
       un clic, cancelar también debe ser un proceso simple, no una llamada o
       un email escondido.
+- [ ] Email transaccional con dominio propio funcionando (recibos,
+      confirmaciones de pago) — ver stack, sección 1.
 
-### 5.3 Legal y RGPD
+**Cuentas/servicios a crear**
+- [ ] Alta como autónomo o sociedad (ver aviso al inicio de esta fase).
+- [ ] Cuenta de desarrollador de Apple (Apple Developer Program, de pago
+      anual).
+- [ ] Cuenta de desarrollador de Google Play (pago único).
+- [ ] Cuenta de Stripe y/o RevenueCat, según lo decidido en 5.2.
+- [ ] Gestoría/asesoría fiscal si aún no la tienes.
 
-- [ ] Firmar el DPA (Acuerdo de Tratamiento de Datos) de Anthropic desde la
-      Consola antes de procesar datos personales de usuarios reales.
-      [Fuente (compound.law, 2026)](https://compound.law/en-DE/tools/anthropic-api/)
+**No se nos pase**
+- [ ] Email de soporte real y monitorizado (no un buzón que nadie mira) —
+      Apple y Google lo piden visible en la ficha de la app.
+- [ ] Política de reembolsos clara antes de la primera venta.
+
+---
+
+## 6. FASE 5 — Legal
+
+El resto del trabajo legal: lo que no era urgente para la Fase 3 pero sí
+para vender de verdad y publicar en las tiendas.
+
+**Construir**
+- [ ] Ampliar a versión definitiva la Política de Privacidad, Términos y
+      Condiciones, y Aviso Legal (obligatorio en España por la LSSI si hay
+      actividad comercial) — que los revise alguien con criterio legal antes
+      de publicarlos.
+- [ ] Cláusula específica sobre el contenido generado por IA en los
+      Términos: quién es dueño del guión que genera el guionista, y que el
+      usuario asume la responsabilidad de verificar antes de publicar (esto
+      conecta directo con la Regla de Oro 0-bis del Informe Maestro: si la
+      app avisa de que puede haber errores, los Términos tienen que decir lo
+      mismo por escrito).
 - [ ] Decidir si la API de Claude se llama en directo (EEUU, exige
       documentar la transferencia internacional con las cláusulas contractuales
       tipo que ya incluye el DPA) o vía una región UE si lo necesitas por
       volumen/cliente sensible.
-- [ ] Redactar y publicar: Política de Privacidad, Términos y Condiciones, y
-      Aviso Legal (obligatorio en España por la LSSI si hay actividad
-      comercial). No se hacen a mano desde cero — hay generadores decentes,
-      pero que los revise alguien con criterio legal antes de publicarlos.
+- [ ] Revisar la política de uso comercial de Anthropic (branding, límites de
+      reventa) al pasar a facturar de verdad, no solo el DPA firmado en Fase 3.
 - [ ] Base legal del tratamiento de datos documentada (registro de
-      actividades de tratamiento, aunque sea sencillo, con menos de 250
-      empleados no siempre es obligatorio pero es buena práctica y te cubre).
-- [ ] Flujo real de "borra mis datos" y "descárgame mis datos" (derechos
-      RGPD), no solo una frase en la política de privacidad.
-- [ ] Cumplimiento del Reglamento de IA de la UE (empieza a aplicarse en
-      agosto de 2026): como "proveedor" de un sistema de IA que envuelve un
-      modelo de terceros, tu obligación principal es de **transparencia**:
-      avisar al usuario de que está hablando/generando con IA, y marcar el
-      contenido generado por IA de forma identificable donde aplique. No es
-      previsible que la app entre en la categoría de "alto riesgo".
+      actividades de tratamiento completo, aunque con menos de 250 empleados
+      no siempre sea obligatorio, es buena práctica y te cubre).
+- [ ] Auditar/completar el cumplimiento del Reglamento de IA de la UE
+      (empieza a aplicarse en agosto de 2026): como "proveedor" de un sistema
+      de IA que envuelve un modelo de terceros, tu obligación principal es de
+      **transparencia** (ya adelantada en la Fase 3) — aquí se revisa que
+      esté completa. No es previsible que la app entre en la categoría de
+      "alto riesgo".
       [Fuente (dev.to/disclos, 2026)](https://dev.to/disclos/what-the-eu-ai-act-actually-requires-from-saas-startups-before-2-august-2026-pia)
+- [ ] **Accesibilidad (Reglamento Europeo de Accesibilidad, EAA):** en vigor
+      desde junio de 2025, con supervisión activa desde 2026. No tengo
+      certeza total de si esta app entra en su alcance obligatorio estricto
+      (los sectores que lista de forma explícita son más concretos: banca,
+      e-commerce, transporte, telecos, ebooks), pero en cuanto exista la
+      tienda de accesorios por afiliación (e-commerce), el argumento de que
+      aplique se refuerza. Confírmalo con un abogado; mientras tanto, apuntar
+      a WCAG 2.1 AA es buena práctica de todos modos.
+      [Fuente (accessible.org, 2026)](https://accessible.org/saas-companies-europe-eaa-prepare/)
 - [ ] IVA de servicios digitales a consumidores UE (régimen OSS/One Stop
       Shop): al vender suscripciones digitales a particulares de la UE hay
       que aplicar el IVA del país del cliente y declararlo. **Esto
       confírmalo con un gestor** — es de las cosas que más dinero cuestan si
       se hacen mal y no se arregla con un commit.
-
-**Cuentas/servicios a crear**
-- [ ] Cuenta de desarrollador de Apple (Apple Developer Program, de pago
-      anual).
-- [ ] Cuenta de desarrollador de Google Play (pago único).
-- [ ] Cuenta de Stripe y/o RevenueCat, según lo decidido en 5.2.
-- [ ] Gestoría/asesoría fiscal si aún no la tienes, antes de facturar de
-      verdad.
+- [ ] Valorar un seguro de responsabilidad civil/cyber antes del lanzamiento
+      público (opcional, pero habitual en cuanto hay cobro real).
 
 **No se nos pase**
-- [ ] Email de soporte real y monitorizado (no un buzón que nadie mira) —
-      Apple y Google lo piden visible en la ficha de la app.
 - [ ] Ficha de privacidad de la app ("App Privacy" de Apple / sección de
       seguridad de datos de Google Play): hay que rellenarla con precisión,
       es un motivo frecuente de rechazo si no coincide con lo que la app
       realmente hace.
-- [ ] Política de reembolsos clara antes de la primera venta.
 
 ---
 
-## 6. FASE 4 — Conexiones reales (Instagram/TikTok)
+## 7. FASE 6 — Lanzamiento
+
+**Construir**
+- [ ] Beta cerrada antes del lanzamiento público (TestFlight en iOS, canal
+      de pruebas internas en Google Play) para pillar fallos con gente real
+      antes de publicar de verdad.
+- [ ] Ficha de tienda (ASO): icono, capturas de pantalla, descripción,
+      palabras clave.
+- [ ] Dominio propio, DNS, hosting de producción (subir de plan gratuito si
+      hace falta por tráfico real).
+- [ ] Publicación en App Store y Google Play.
+
+**Cuentas/servicios a crear**
+- [ ] PostHog (o la analítica elegida) para saber qué pantallas se usan y
+      dónde abandona la gente.
+
+**No se nos pase**
+- [ ] Confirmar que todo lo de la Fase 5 (fichas de privacidad, textos
+      legales, IVA) está publicado y no solo escrito, antes de enviar a
+      revisión de las tiendas.
+
+---
+
+## 8. FASE 7 — Conexiones sociales (Instagram/TikTok)
+
+**No bloquea el lanzamiento.** Se puede trabajar en paralelo si sobra tiempo,
+pero no impide pasar a la Fase 6 ni publicar la app: mientras tanto (y para
+siempre, si hace falta) la app funciona con métricas metidas a mano, ya
+construido en la Fase 2.
 
 Confirmado con fuentes de 2026, y es tan largo como avisa el Informe Maestro:
 
@@ -278,12 +404,13 @@ Confirmado con fuentes de 2026, y es tan largo como avisa el Informe Maestro:
 **No se nos pase**
 - [ ] Presupuestar tiempo de espera real de aprobación en el plan del
       proyecto — no depende de ti, depende de Meta/TikTok.
-- [ ] Plan B mientras se aprueba: la app sigue funcionando con métricas a
-      mano (ya construido en Fase 1), así que esta fase no bloquea el resto.
 
 ---
 
-## 7. Bloques de producción (5-bis) — checklist técnico
+## 9. Bloques de producción (5-bis) — checklist técnico
+
+No dependen de una fase concreta del cobro/legal — son galerías y guías, no
+piezas técnicas duras. Se pueden empezar en cuanto la Fase 1/2 ande.
 
 - [ ] **Biblioteca de formatos:** modelo de datos simple (formato → lista de
       imágenes/clips + texto guía), panel para que Roger suba/gestione el
@@ -301,7 +428,9 @@ Confirmado con fuentes de 2026, y es tan largo como avisa el Informe Maestro:
 
 ---
 
-## 8. FASE 5 — Pulir y crecer
+## 10. Después del lanzamiento — pulir y crecer
+
+Trabajo continuo, no una fase con final:
 
 - [ ] Canal de feedback de usuarios (aunque sea un formulario o un email).
 - [ ] Panel propio (aunque sea interno) para ver uso real: qué agente se usa
@@ -314,11 +443,13 @@ Confirmado con fuentes de 2026, y es tan largo como avisa el Informe Maestro:
 - [ ] Repurposing en modo guía (5-quater-D).
 - [ ] Tienda de accesorios por afiliación (5-ter vía A): pantalla de
       recomendaciones + enlaces de afiliado, con etiqueta visible de
-      "publicidad" o "enlace de afiliado" (obligación legal en España/UE).
+      "publicidad" o "enlace de afiliado" (obligación legal en España/UE) —
+      y en cuanto exista, revisar si activa la aplicación estricta del EAA
+      (ver Fase 5).
 
 ---
 
-## 9. Checklist "que no se nos pase" — seguridad y calidad transversal
+## 11. Checklist "que no se nos pase" — seguridad y calidad transversal
 
 Cosas que no pertenecen a una fase concreta sino que hay que vigilar siempre:
 
@@ -336,7 +467,7 @@ Cosas que no pertenecen a una fase concreta sino que hay que vigilar siempre:
       crítico (login, cobro, generación de contenido).
 - [ ] **Accesibilidad básica** en la app (tamaños de texto, contraste —
       el verde muy oscuro + ámbar hay que revisarlo con un chequeo de
-      contraste real).
+      contraste real; ver también EAA en Fase 5).
 - [ ] **Plan de qué pasa si Anthropic tiene una caída** — mensaje de error
       claro al usuario, no una app que parece rota.
 - [ ] **Versión y registro de cambios** del repo, aunque sea informal, para
@@ -344,23 +475,24 @@ Cosas que no pertenecen a una fase concreta sino que hay que vigilar siempre:
 
 ---
 
-## 10. Resumen: qué cuenta/servicio se crea en cada fase
+## 12. Resumen: qué cuenta/servicio se crea en cada fase
 
 | Fase | Cuentas/servicios nuevos |
 |---|---|
-| 0 | Repo Git, cuenta Anthropic Console |
-| 1 | Expo/EAS, hosting backend (Railway/Render) |
-| 2 | Supabase (o BD elegida), Sentry |
-| 3 | Apple Developer Program, Google Play Developer, Stripe y/o RevenueCat, gestoría fiscal, DPA firmado con Anthropic |
-| 4 | Meta Developer Account + Verificación de Empresa, TikTok for Developers |
-| 5 | PostHog u otra analítica, programas de afiliados |
+| 1 — Maqueta y diseño | Repo Git (hecho), Anthropic Console, Expo/EAS (si se confirma React Native) |
+| 2 — Funciones reales | Hosting backend (Railway/Render) |
+| 3 — Cuentas y accesos | Supabase (o BD elegida), Sentry |
+| 4 — Cobro | Alta autónomo/sociedad, Apple Developer Program, Google Play Developer, Stripe y/o RevenueCat, gestoría fiscal |
+| 5 — Legal | (mayormente ya cubiertas en Fase 3-4; aquí se cierra el DPA/textos definitivos, posible seguro) |
+| 6 — Lanzamiento | PostHog u otra analítica, dominio |
+| 7 — Conexiones sociales | Meta Developer Account + Verificación de Empresa, TikTok for Developers |
 
 ---
 
-## 11. Recordatorio
+## 13. Recordatorio
 
 Este roadmap es una foto de agosto de 2026: las reglas de las tiendas de
-apps y la normativa (RGPD, Reglamento de IA de la UE) cambian. Antes de
-ejecutar cualquier punto de la sección 5 (pagos, legal) o 6 (Instagram/
-TikTok), vale la pena una comprobación rápida de que sigue vigente tal cual
-está escrito aquí.
+apps y la normativa (RGPD, Reglamento de IA de la UE, EAA) cambian. Antes de
+ejecutar cualquier punto de la Fase 4 (cobro), la Fase 5 (legal) o la Fase 7
+(Instagram/TikTok), vale la pena una comprobación rápida de que sigue
+vigente tal cual está escrito aquí.
