@@ -1,5 +1,7 @@
 import { useState } from "react";
+import { Pressable, ScrollView, StyleSheet, Text, View } from "react-native";
 import { SEMANA, GUION_DEL_DIA, ANALISIS_VIDEOS } from "../data/mockData";
+import { colors, fonts } from "../theme/theme";
 
 type Pestana = "semana" | "guion" | "analisis";
 
@@ -13,134 +15,284 @@ export function Dashboard() {
   const [pestana, setPestana] = useState<Pestana>("semana");
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-3xl flex-col gap-6 px-6 py-12">
-      <header className="flex flex-col gap-1 text-center">
-        <h1 className="font-rotulo text-2xl font-bold uppercase tracking-wide text-white">
-          Tu panel
-        </h1>
-        <p className="text-xs uppercase tracking-wide text-white/40">
-          Datos de ejemplo — Fase 1, aún sin conectar a tus redes
-        </p>
-      </header>
+    <ScrollView contentContainerStyle={styles.scroll}>
+      <View style={styles.header}>
+        <Text style={styles.titulo}>Tu panel</Text>
+        <Text style={styles.subtitulo}>Datos de ejemplo — Fase 1, aún sin conectar a tus redes</Text>
+      </View>
 
-      <nav className="flex justify-center gap-2">
-        {PESTANAS.map((t) => (
-          <button
-            key={t.id}
-            type="button"
-            onClick={() => setPestana(t.id)}
-            className={`font-rotulo rounded-md px-5 py-2 text-sm font-semibold uppercase tracking-wide transition-colors ${
-              pestana === t.id
-                ? "bg-ambar text-pantano"
-                : "bg-pantano-light text-white/70 hover:text-white"
-            }`}
-          >
-            {t.etiqueta}
-          </button>
-        ))}
-      </nav>
+      <View style={styles.tabs}>
+        {PESTANAS.map((t) => {
+          const activa = pestana === t.id;
+          return (
+            <Pressable
+              key={t.id}
+              onPress={() => setPestana(t.id)}
+              style={[styles.tab, activa ? styles.tabActiva : styles.tabInactiva]}
+            >
+              <Text style={[styles.tabTexto, { color: activa ? colors.pantano : colors.textoTenue }]}>
+                {t.etiqueta}
+              </Text>
+            </Pressable>
+          );
+        })}
+      </View>
 
       {pestana === "semana" && <PestanaSemana />}
       {pestana === "guion" && <PestanaGuion />}
       {pestana === "analisis" && <PestanaAnalisis />}
-    </main>
+    </ScrollView>
   );
 }
 
 function PestanaSemana() {
   return (
-    <div className="flex flex-col gap-3">
+    <View style={styles.lista}>
       {SEMANA.map((d) => (
-        <div
-          key={d.dia}
-          className="flex flex-col gap-2 rounded-lg border border-white/10 bg-pantano-light p-4 sm:flex-row sm:items-center sm:justify-between"
-        >
-          <div>
-            <p className="font-rotulo text-sm font-semibold uppercase tracking-wide text-ambar">
-              {d.dia}
-              {d.tendencia && (
-                <span className="ml-2 rounded bg-ambar/20 px-2 py-0.5 text-[10px] text-ambar-soft">
-                  Tendencia
-                </span>
-              )}
-            </p>
-            <p className="text-sm text-white">
-              {d.pilar} · <span className="text-white/50">{d.tipo}</span>
-            </p>
-          </div>
-          <p className="max-w-sm text-sm text-white/60 sm:text-right">{d.notaDirector}</p>
-        </div>
+        <View key={d.dia} style={styles.tarjeta}>
+          <View style={styles.filaEntreDia}>
+            <Text style={styles.diaTitulo}>{d.dia}</Text>
+            {d.tendencia && (
+              <View style={styles.badge}>
+                <Text style={styles.badgeTexto}>Tendencia</Text>
+              </View>
+            )}
+          </View>
+          <Text style={styles.diaPilar}>
+            {d.pilar} · <Text style={{ color: colors.textoTenue }}>{d.tipo}</Text>
+          </Text>
+          <Text style={styles.diaNota}>{d.notaDirector}</Text>
+        </View>
       ))}
-    </div>
+    </View>
   );
 }
 
 function PestanaGuion() {
   return (
-    <div className="flex flex-col gap-6">
-      <div className="text-center">
-        <p className="text-xs uppercase tracking-wide text-white/40">{GUION_DEL_DIA.dia}</p>
-        <h2 className="font-rotulo text-lg font-semibold text-white">{GUION_DEL_DIA.tema}</h2>
-      </div>
+    <View style={styles.lista}>
+      <View style={{ alignItems: "center", gap: 4 }}>
+        <Text style={styles.diaEtiqueta}>{GUION_DEL_DIA.dia}</Text>
+        <Text style={styles.guionTema}>{GUION_DEL_DIA.tema}</Text>
+      </View>
 
-      <div className="flex flex-col gap-3">
-        {GUION_DEL_DIA.bloques.map((b) => (
-          <div
-            key={b.rango}
-            className="flex items-start gap-4 rounded-lg border border-white/10 bg-pantano-light p-4"
-          >
-            <span className="font-rotulo w-16 shrink-0 text-sm font-bold text-ambar">
-              {b.rango}
-            </span>
-            <div>
-              <p className="font-medium text-white">{b.nombre}</p>
-              <p className="text-sm text-white/60">{b.funcion}</p>
-            </div>
-          </div>
-        ))}
-      </div>
+      {GUION_DEL_DIA.bloques.map((b) => (
+        <View key={b.rango} style={[styles.tarjeta, styles.filaBloque]}>
+          <Text style={styles.bloqueRango}>{b.rango}</Text>
+          <View style={{ flex: 1 }}>
+            <Text style={styles.bloqueNombre}>{b.nombre}</Text>
+            <Text style={styles.bloqueFuncion}>{b.funcion}</Text>
+          </View>
+        </View>
+      ))}
 
-      <div>
-        <p className="font-rotulo mb-2 text-sm font-semibold uppercase tracking-wide text-white/70">
-          4 opciones de gancho
-        </p>
-        <div className="flex flex-col gap-2">
-          {GUION_DEL_DIA.ganchos.map((g, i) => (
-            <details
-              key={i}
-              className="rounded-md border border-white/10 bg-pantano-light px-4 py-3 text-sm text-white/80"
-            >
-              <summary className="cursor-pointer font-medium text-white">
-                Opción {i + 1}
-              </summary>
-              <p className="mt-2 text-white/70">{g}</p>
-            </details>
-          ))}
-        </div>
-      </div>
-    </div>
+      <Text style={styles.subtituloSeccion}>4 opciones de gancho</Text>
+      {GUION_DEL_DIA.ganchos.map((g, i) => (
+        <OpcionGancho key={i} indice={i + 1} texto={g} />
+      ))}
+    </View>
+  );
+}
+
+function OpcionGancho({ indice, texto }: { indice: number; texto: string }) {
+  const [abierto, setAbierto] = useState(false);
+  return (
+    <Pressable style={styles.tarjeta} onPress={() => setAbierto((v) => !v)}>
+      <Text style={styles.opcionTitulo}>{abierto ? "▾" : "▸"} Opción {indice}</Text>
+      {abierto && <Text style={styles.opcionTexto}>{texto}</Text>}
+    </Pressable>
   );
 }
 
 function PestanaAnalisis() {
   return (
-    <div className="flex flex-col gap-3">
+    <View style={styles.lista}>
       {ANALISIS_VIDEOS.map((v) => (
-        <div key={v.titulo} className="rounded-lg border border-white/10 bg-pantano-light p-4">
-          <div className="flex items-center justify-between gap-4">
-            <p className="font-medium text-white">{v.titulo}</p>
-            <span className="font-rotulo shrink-0 text-sm font-bold text-ambar">
-              {v.retencion}% retención
-            </span>
-          </div>
-          <p className="mt-1 text-xs text-white/40">{v.views.toLocaleString("es-ES")} views</p>
-          <p className="mt-3 text-sm text-white/70">
-            <span className="font-semibold text-white/90">Bloque que falló: </span>
+        <View key={v.titulo} style={styles.tarjeta}>
+          <View style={styles.filaEntreDia}>
+            <Text style={styles.videoTitulo}>{v.titulo}</Text>
+            <Text style={styles.videoRetencion}>{v.retencion}% retención</Text>
+          </View>
+          <Text style={styles.videoViews}>{v.views.toLocaleString("es-ES")} views</Text>
+          <Text style={styles.videoBloque}>
+            <Text style={{ fontFamily: fonts.cuerpoMedio, color: colors.texto }}>Bloque que falló: </Text>
             {v.bloqueFallo}
-          </p>
-          <p className="mt-1 text-sm text-white/60">{v.ordenAnalista}</p>
-        </div>
+          </Text>
+          <Text style={styles.videoOrden}>{v.ordenAnalista}</Text>
+        </View>
       ))}
-    </div>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  scroll: {
+    flexGrow: 1,
+    backgroundColor: colors.pantano,
+    paddingHorizontal: 20,
+    paddingVertical: 32,
+    gap: 20,
+    alignItems: "stretch",
+  },
+  header: {
+    alignItems: "center",
+    gap: 4,
+  },
+  titulo: {
+    fontFamily: fonts.rotuloBold,
+    fontSize: 22,
+    textTransform: "uppercase",
+    color: colors.texto,
+  },
+  subtitulo: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 11,
+    textTransform: "uppercase",
+    color: colors.textoMuyTenue,
+    letterSpacing: 0.3,
+  },
+  tabs: {
+    flexDirection: "row",
+    justifyContent: "center",
+    gap: 8,
+  },
+  tab: {
+    borderRadius: 6,
+    paddingHorizontal: 18,
+    paddingVertical: 8,
+  },
+  tabActiva: {
+    backgroundColor: colors.ambar,
+  },
+  tabInactiva: {
+    backgroundColor: colors.pantanoLight,
+  },
+  tabTexto: {
+    fontFamily: fonts.rotulo,
+    fontSize: 13,
+    textTransform: "uppercase",
+  },
+  lista: {
+    gap: 12,
+  },
+  tarjeta: {
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.borde,
+    backgroundColor: colors.pantanoLight,
+    padding: 14,
+    gap: 4,
+  },
+  filaEntreDia: {
+    flexDirection: "row",
+    alignItems: "center",
+    justifyContent: "space-between",
+    gap: 8,
+  },
+  diaTitulo: {
+    fontFamily: fonts.rotulo,
+    fontSize: 13,
+    textTransform: "uppercase",
+    color: colors.ambar,
+    letterSpacing: 0.3,
+  },
+  badge: {
+    backgroundColor: "rgba(224, 168, 46, 0.2)",
+    borderRadius: 4,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
+  },
+  badgeTexto: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 10,
+    color: colors.ambarSoft,
+  },
+  diaPilar: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 14,
+    color: colors.texto,
+  },
+  diaNota: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 13,
+    color: colors.textoTenue,
+    lineHeight: 18,
+  },
+  diaEtiqueta: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 11,
+    textTransform: "uppercase",
+    color: colors.textoMuyTenue,
+  },
+  guionTema: {
+    fontFamily: fonts.rotulo,
+    fontSize: 16,
+    color: colors.texto,
+    textAlign: "center",
+  },
+  filaBloque: {
+    flexDirection: "row",
+    gap: 14,
+  },
+  bloqueRango: {
+    fontFamily: fonts.rotuloBold,
+    fontSize: 13,
+    color: colors.ambar,
+    width: 56,
+  },
+  bloqueNombre: {
+    fontFamily: fonts.cuerpoMedio,
+    fontSize: 14,
+    color: colors.texto,
+  },
+  bloqueFuncion: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 12,
+    color: colors.textoTenue,
+  },
+  subtituloSeccion: {
+    fontFamily: fonts.rotulo,
+    fontSize: 13,
+    textTransform: "uppercase",
+    color: colors.textoTenue,
+    marginTop: 8,
+  },
+  opcionTitulo: {
+    fontFamily: fonts.cuerpoMedio,
+    fontSize: 14,
+    color: colors.texto,
+  },
+  opcionTexto: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 13,
+    color: colors.textoTenue,
+    marginTop: 6,
+  },
+  videoTitulo: {
+    fontFamily: fonts.cuerpoMedio,
+    fontSize: 14,
+    color: colors.texto,
+    flexShrink: 1,
+  },
+  videoRetencion: {
+    fontFamily: fonts.rotuloBold,
+    fontSize: 13,
+    color: colors.ambar,
+  },
+  videoViews: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 11,
+    color: colors.textoMuyTenue,
+  },
+  videoBloque: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 13,
+    color: colors.textoTenue,
+    marginTop: 4,
+  },
+  videoOrden: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 13,
+    color: colors.textoTenue,
+  },
+});

@@ -76,13 +76,12 @@ con Claude Code):
 Nada de esto es definitivo ni caro: casi todo tiene capa gratuita suficiente
 para la Fase 1 y 2.
 
-> **Nota de estado (agosto 2026):** la maqueta de la Fase 1 ya arrancada en
-> este repo (`frontend/`) está montada en **web con Vite + React**, no en
-> Expo/React Native como recomienda esta tabla. Es una decisión pendiente de
-> confirmar contigo: seguir en web (más rápido de iterar, pero sin tiendas de
-> apps) o migrar a Expo antes de entrar en la Fase 2, ya que cambiar de stack
-> a mitad de la Fase 2 (con backend real ya conectado) sale más caro que
-> decidirlo ahora.
+> **Nota de estado (agosto 2026):** decidido — la maqueta de la Fase 1
+> (`frontend/`) está migrada a **Expo + React Native + TypeScript**, alineada
+> con esta tabla. Portada, Onboarding y Dashboard (Semana/Guión/Análisis)
+> reconstruidos sobre componentes nativos, verificados también en el target
+> web de Expo (`npm run web`, usa `react-native-web`) para revisión rápida
+> sin simulador.
 
 ---
 
@@ -100,16 +99,15 @@ la API de Claude todavía. **Es donde estamos.**
 - [ ] Bocetar (aunque sea en texto) las pantallas nuevas de 5-bis
       (formatos de grabación, presencia en cámara, teleprompter).
 - [x] Portada, Onboarding (simulado) y Dashboard (Semana/Guión/Análisis) con
-      datos de ejemplo — hecho en `frontend/` (web, Vite + React).
-- [ ] Decidir si se mantiene web o se migra a Expo/React Native (ver nota de
-      la sección 1) antes de pasar a la Fase 2.
+      datos de ejemplo — hecho en `frontend/` sobre **Expo + React Native +
+      TypeScript**, verificado también en el target web de Expo.
 
 **Cuentas/servicios a crear**
 - [x] Repositorio Git (`rogermesas7/app`).
 - [ ] Cuenta de Anthropic Console + método de pago, para tener ya la API key
       lista en cuanto arranque la Fase 2.
-- [ ] Cuenta Expo/EAS (gratis para empezar) — solo si se confirma migración
-      a React Native.
+- [ ] Cuenta Expo/EAS (gratis para empezar) — necesaria para compilar
+      (EAS Build) cuando toque publicar, no bloquea seguir en la Fase 1.
 
 **No se nos pase**
 - [ ] Comprobar que el nombre elegido no choca con una marca registrada

@@ -1,5 +1,7 @@
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
+import { Animated, Pressable, StyleSheet, Text, View } from "react-native";
 import { AGENTES } from "../data/mockData";
+import { colors, fonts } from "../theme/theme";
 
 type Paso = "grabar" | "generando" | "desplegando";
 
@@ -26,83 +28,259 @@ export function Onboarding({ onCompletar }: OnboardingProps) {
     setPaso("generando");
     // Simulación de la extracción de la biblia de marca.
     // Aquí no se llama a ninguna IA todavía: es solo la animación de la Fase 1.
-    window.setTimeout(() => setPaso("desplegando"), 1400);
+    setTimeout(() => setPaso("desplegando"), 1400);
   }
 
   return (
-    <main className="flex min-h-screen flex-col items-center justify-center gap-10 px-6 py-16 text-center">
+    <View style={styles.container}>
       {paso === "grabar" && (
-        <div className="flex max-w-md flex-col items-center gap-6">
-          <h1 className="font-rotulo text-3xl font-bold uppercase tracking-wide text-white">
-            Cuéntanos quién eres
-          </h1>
-          <p className="text-white/60">
-            Graba un audio corto contando tu marca: quién eres, de qué hablas y a
-            quién le hablas. Con eso tu equipo arma tu biblia de marca.
-          </p>
-
-          <button
-            type="button"
-            onClick={alternarGrabacion}
-            className={`font-rotulo flex h-24 w-24 items-center justify-center rounded-full text-sm font-semibold uppercase tracking-wide transition-colors ${
-              grabando
-                ? "animate-pulse bg-red-500 text-white"
-                : "bg-ambar text-pantano hover:bg-ambar-soft"
-            }`}
-          >
-            {grabando ? "Grabando…" : "Grabar"}
-          </button>
-
-          {grabacionLista && !grabando && (
-            <p className="text-sm text-ambar">Grabación lista.</p>
-          )}
-
-          <button
-            type="button"
-            onClick={continuar}
-            disabled={!grabacionLista}
-            className="font-rotulo rounded-md border border-white/20 px-8 py-3 text-sm font-semibold uppercase tracking-wide text-white/80 transition-colors enabled:hover:border-ambar enabled:hover:text-ambar disabled:cursor-not-allowed disabled:opacity-30"
-          >
-            Continuar
-          </button>
-        </div>
+        <PasoGrabar
+          grabando={grabando}
+          grabacionLista={grabacionLista}
+          onAlternar={alternarGrabacion}
+          onContinuar={continuar}
+        />
       )}
-
-      {paso === "generando" && (
-        <div className="flex flex-col items-center gap-4">
-          <div className="h-10 w-10 animate-spin rounded-full border-2 border-ambar border-t-transparent" />
-          <p className="font-rotulo text-lg uppercase tracking-wide text-white/70">
-            Extrayendo tu biblia de marca…
-          </p>
-        </div>
-      )}
-
-      {paso === "desplegando" && (
-        <div className="flex max-w-lg flex-col items-center gap-8">
-          <h1 className="font-rotulo text-3xl font-bold uppercase tracking-wide text-white">
-            Desplegando tu <span className="text-ambar">equipo</span>
-          </h1>
-          <ul className="flex w-full flex-col gap-3 text-left">
-            {AGENTES.map((agente, i) => (
-              <li
-                key={agente.nombre}
-                className="flex items-center gap-3 rounded-md border border-white/10 bg-pantano-light px-4 py-3 opacity-0 animate-[fadeIn_0.4s_ease_forwards]"
-                style={{ animationDelay: `${i * 0.15}s` }}
-              >
-                <span className="text-ambar">✓</span>
-                <span className="font-medium text-white">{agente.nombre}</span>
-              </li>
-            ))}
-          </ul>
-          <button
-            type="button"
-            onClick={onCompletar}
-            className="font-rotulo rounded-md bg-ambar px-8 py-3 text-base font-semibold uppercase tracking-wide text-pantano transition-colors hover:bg-ambar-soft"
-          >
-            Entrar al panel
-          </button>
-        </div>
-      )}
-    </main>
+      {paso === "generando" && <PasoGenerando />}
+      {paso === "desplegando" && <PasoDesplegando onCompletar={onCompletar} />}
+    </View>
   );
 }
+
+function PasoGrabar({
+  grabando,
+  grabacionLista,
+  onAlternar,
+  onContinuar,
+}: {
+  grabando: boolean;
+  grabacionLista: boolean;
+  onAlternar: () => void;
+  onContinuar: () => void;
+}) {
+  const pulso = useRef(new Animated.Value(1)).current;
+
+  useEffect(() => {
+    if (!grabando) {
+      pulso.setValue(1);
+      return;
+    }
+    const anim = Animated.loop(
+      Animated.sequence([
+        Animated.timing(pulso, { toValue: 0.6, duration: 500, useNativeDriver: true }),
+        Animated.timing(pulso, { toValue: 1, duration: 500, useNativeDriver: true }),
+      ])
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [grabando, pulso]);
+
+  return (
+    <View style={styles.centro}>
+      <Text style={styles.titulo}>Cuéntanos quién eres</Text>
+      <Text style={styles.parrafo}>
+        Graba un audio corto contando tu marca: quién eres, de qué hablas y a
+        quién le hablas. Con eso tu equipo arma tu biblia de marca.
+      </Text>
+
+      <Pressable onPress={onAlternar}>
+        <Animated.View
+          style={[
+            styles.botonGrabar,
+            { backgroundColor: grabando ? "#ef4444" : colors.ambar, opacity: pulso },
+          ]}
+        >
+          <Text style={[styles.botonGrabarTexto, { color: grabando ? "#fff" : colors.pantano }]}>
+            {grabando ? "Grabando…" : "Grabar"}
+          </Text>
+        </Animated.View>
+      </Pressable>
+
+      {grabacionLista && !grabando && <Text style={styles.avisoListo}>Grabación lista.</Text>}
+
+      <Pressable
+        onPress={onContinuar}
+        disabled={!grabacionLista}
+        style={[styles.botonSecundario, !grabacionLista && styles.botonSecundarioDisabled]}
+      >
+        <Text style={styles.botonSecundarioTexto}>Continuar</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+function PasoGenerando() {
+  const rotacion = useRef(new Animated.Value(0)).current;
+
+  useEffect(() => {
+    const anim = Animated.loop(
+      Animated.timing(rotacion, { toValue: 1, duration: 900, useNativeDriver: true })
+    );
+    anim.start();
+    return () => anim.stop();
+  }, [rotacion]);
+
+  const rotate = rotacion.interpolate({ inputRange: [0, 1], outputRange: ["0deg", "360deg"] });
+
+  return (
+    <View style={styles.centro}>
+      <Animated.View style={[styles.spinner, { transform: [{ rotate }] }]} />
+      <Text style={styles.tituloMedio}>Extrayendo tu biblia de marca…</Text>
+    </View>
+  );
+}
+
+function PasoDesplegando({ onCompletar }: { onCompletar: () => void }) {
+  return (
+    <View style={styles.centro}>
+      <Text style={styles.titulo}>
+        Desplegando tu <Text style={{ color: colors.ambar }}>equipo</Text>
+      </Text>
+      <View style={styles.listaAgentes}>
+        {AGENTES.map((agente, i) => (
+          <AgenteFila key={agente.nombre} nombre={agente.nombre} delay={i * 150} />
+        ))}
+      </View>
+      <Pressable style={styles.boton} onPress={onCompletar}>
+        <Text style={styles.botonTexto}>Entrar al panel</Text>
+      </Pressable>
+    </View>
+  );
+}
+
+function AgenteFila({ nombre, delay }: { nombre: string; delay: number }) {
+  const opacidad = useRef(new Animated.Value(0)).current;
+  const traslado = useRef(new Animated.Value(8)).current;
+
+  useEffect(() => {
+    Animated.parallel([
+      Animated.timing(opacidad, { toValue: 1, duration: 400, delay, useNativeDriver: true }),
+      Animated.timing(traslado, { toValue: 0, duration: 400, delay, useNativeDriver: true }),
+    ]).start();
+  }, [opacidad, traslado, delay]);
+
+  return (
+    <Animated.View
+      style={[
+        styles.filaAgente,
+        { opacity: opacidad, transform: [{ translateY: traslado }] },
+      ]}
+    >
+      <Text style={styles.check}>✓</Text>
+      <Text style={styles.nombreAgente}>{nombre}</Text>
+    </Animated.View>
+  );
+}
+
+const styles = StyleSheet.create({
+  container: {
+    flex: 1,
+    backgroundColor: colors.pantano,
+    alignItems: "center",
+    justifyContent: "center",
+    paddingHorizontal: 24,
+  },
+  centro: {
+    alignItems: "center",
+    gap: 24,
+    maxWidth: 420,
+  },
+  titulo: {
+    fontFamily: fonts.rotuloBold,
+    fontSize: 26,
+    textAlign: "center",
+    textTransform: "uppercase",
+    color: colors.texto,
+  },
+  tituloMedio: {
+    fontFamily: fonts.rotulo,
+    fontSize: 16,
+    textAlign: "center",
+    textTransform: "uppercase",
+    color: colors.textoTenue,
+  },
+  parrafo: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 14,
+    textAlign: "center",
+    color: colors.textoTenue,
+    lineHeight: 20,
+  },
+  botonGrabar: {
+    width: 96,
+    height: 96,
+    borderRadius: 48,
+    alignItems: "center",
+    justifyContent: "center",
+  },
+  botonGrabarTexto: {
+    fontFamily: fonts.rotulo,
+    fontSize: 13,
+    textTransform: "uppercase",
+  },
+  avisoListo: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 13,
+    color: colors.ambar,
+  },
+  botonSecundario: {
+    borderWidth: 1,
+    borderColor: colors.borde,
+    borderRadius: 8,
+    paddingHorizontal: 32,
+    paddingVertical: 12,
+  },
+  botonSecundarioDisabled: {
+    opacity: 0.3,
+  },
+  botonSecundarioTexto: {
+    fontFamily: fonts.rotulo,
+    fontSize: 14,
+    textTransform: "uppercase",
+    color: colors.texto,
+  },
+  spinner: {
+    width: 40,
+    height: 40,
+    borderRadius: 20,
+    borderWidth: 3,
+    borderColor: colors.ambar,
+    borderTopColor: "transparent",
+  },
+  listaAgentes: {
+    width: "100%",
+    gap: 12,
+  },
+  filaAgente: {
+    flexDirection: "row",
+    alignItems: "center",
+    gap: 12,
+    borderRadius: 6,
+    borderWidth: 1,
+    borderColor: colors.borde,
+    backgroundColor: colors.pantanoLight,
+    paddingHorizontal: 16,
+    paddingVertical: 12,
+  },
+  check: {
+    color: colors.ambar,
+  },
+  nombreAgente: {
+    fontFamily: fonts.cuerpoMedio,
+    fontSize: 14,
+    color: colors.texto,
+  },
+  boton: {
+    backgroundColor: colors.ambar,
+    borderRadius: 8,
+    paddingHorizontal: 32,
+    paddingVertical: 14,
+  },
+  botonTexto: {
+    fontFamily: fonts.rotulo,
+    fontSize: 16,
+    textTransform: "uppercase",
+    color: colors.pantano,
+    letterSpacing: 0.5,
+  },
+});

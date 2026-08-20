@@ -1,3 +1,6 @@
+import { StyleSheet, Text, View } from "react-native";
+import { colors, fonts } from "../theme/theme";
+
 type AgentCardProps = {
   nombre: string;
   funcion: string;
@@ -5,11 +8,34 @@ type AgentCardProps = {
 
 export function AgentCard({ nombre, funcion }: AgentCardProps) {
   return (
-    <div className="rounded-lg border border-white/10 bg-pantano-light p-5 text-left transition-colors hover:border-ambar/50">
-      <h3 className="font-rotulo text-lg font-semibold tracking-wide text-ambar">
-        {nombre}
-      </h3>
-      <p className="mt-1 text-sm text-white/70">{funcion}</p>
-    </div>
+    <View style={styles.card}>
+      <Text style={styles.nombre}>{nombre}</Text>
+      <Text style={styles.funcion}>{funcion}</Text>
+    </View>
   );
 }
+
+const styles = StyleSheet.create({
+  card: {
+    flexBasis: "48%",
+    flexGrow: 1,
+    borderRadius: 8,
+    borderWidth: 1,
+    borderColor: colors.borde,
+    backgroundColor: colors.pantanoLight,
+    padding: 16,
+  },
+  nombre: {
+    fontFamily: fonts.rotulo,
+    fontSize: 16,
+    color: colors.ambar,
+    letterSpacing: 0.3,
+  },
+  funcion: {
+    fontFamily: fonts.cuerpo,
+    fontSize: 13,
+    color: colors.textoTenue,
+    marginTop: 4,
+    lineHeight: 18,
+  },
+});
